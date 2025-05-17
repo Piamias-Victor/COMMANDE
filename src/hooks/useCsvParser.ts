@@ -48,7 +48,7 @@ export const useCsvParser = (options: UseCsvParserOptions = {}) => {
               const parsedItems: ParsedItem[] = [];
               const errors: string[] = [];
               
-              result.data.forEach((row, index) => {
+              result.data.forEach((row: any, index) => {
                 if (Array.isArray(row) && row.length >= 2) {
                   const code = String(row[0]).trim();
                   const quantityStr = String(row[1]).trim();

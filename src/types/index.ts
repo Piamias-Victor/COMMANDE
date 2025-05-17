@@ -19,6 +19,23 @@ export interface Pharmacy {
 }
 
 /**
+ * État de l'interface utilisateur
+ */
+export interface UIState {
+  /** Indique si une opération de chargement est en cours */
+  isLoading: boolean;
+  /** Message d'erreur à afficher */
+  error: string | null;
+  /** Notification à afficher */
+  notification: {
+    /** Type de notification */
+    type: 'success' | 'error' | 'info' | null;
+    /** Message de la notification */
+    message: string | null;
+  };
+}
+
+/**
  * Représente un laboratoire pharmaceutique
  */
 export interface Lab {

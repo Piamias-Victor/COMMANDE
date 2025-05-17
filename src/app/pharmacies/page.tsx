@@ -35,7 +35,13 @@ export default function PharmaciesPage() {
       toast.success('Pharmacie mise à jour avec succès');
       setIsEditing(null);
     } else {
-      addPharmacy(newName.trim(), newEmail.trim(), newAddress.trim() || undefined);
+      addPharmacy(
+        null,  // ID null pour générer un nouvel ID
+        newName.trim(), 
+        newEmail.trim(), 
+        'password',  // Mot de passe par défaut
+        newAddress.trim() || undefined
+      );
       toast.success('Pharmacie ajoutée avec succès');
       setIsAdding(false);
     }

@@ -167,7 +167,7 @@ export const useOrderStore = create<OrderState>()(
         
         // Calculer le nombre total de références et de boîtes
         // Supporter à la fois referencesCount (nouveau) et itemCount (ancien)
-        const totalReferences = labOrders.reduce((sum, order) => {
+        const totalReferences = labOrders.reduce((sum, order: any) => {
           if ('referencesCount' in order) {
             return sum + order.referencesCount;
           } else if ('itemCount' in order) {
@@ -177,7 +177,7 @@ export const useOrderStore = create<OrderState>()(
         }, 0);
         
         // Supporter à la fois boxesCount (nouveau) et itemCount (ancien)
-        const totalBoxes = labOrders.reduce((sum, order) => {
+        const totalBoxes = labOrders.reduce((sum, order : any) => {
           if ('boxesCount' in order) {
             return sum + order.boxesCount;
           } else if ('itemCount' in order) {

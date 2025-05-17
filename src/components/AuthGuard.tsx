@@ -9,7 +9,8 @@ interface AuthGuardProps {
 }
 
 export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
-  const { data: status } = useSession();
+  // Corriger cette ligne pour utiliser la propriété status correctement
+  const { status } = useSession();
   const router = useRouter();
   const pathname = usePathname();
 

@@ -19,8 +19,10 @@ export const PharmacySelector: React.FC = () => {
   const handleCreatePharmacy = () => {
     if (newPharmacyName.trim() && newPharmacyEmail.trim()) {
       addPharmacy(
+        null,  // ID null pour générer un nouvel ID
         newPharmacyName.trim(), 
         newPharmacyEmail.trim(), 
+        'password',  // Mot de passe par défaut
         newPharmacyAddress.trim() || undefined
       );
       setNewPharmacyName('');
