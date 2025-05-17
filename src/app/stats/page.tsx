@@ -7,7 +7,7 @@ import { useLabStore } from '@/store/labStore';
 import { Select } from '@/components/ui/Select';
 
 export default function StatsPage() {
-  const { labs, selectedLabId } = useLabStore();
+  const { labs } = useLabStore();
   const [filterLabId, setFilterLabId] = useState<string | undefined>(undefined);
   
   return (

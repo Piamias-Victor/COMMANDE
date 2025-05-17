@@ -12,7 +12,6 @@ import { Button } from '@/components/ui/Button';
 import toast from 'react-hot-toast';
 
 export const CsvUploader: React.FC = () => {
-  const { data: session } = useSession();
   const pharmacyId = usePharmacyId(); // Utiliser notre hook personnalisé
   const { selectedLabId } = useLabStore();
   const { addOrder } = useOrderStore();
@@ -173,7 +172,7 @@ export const CsvUploader: React.FC = () => {
       {!selectedLabId && (
         <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-100 dark:border-yellow-800 rounded-md mb-4 slide-in">
           <p className="text-yellow-800 dark:text-yellow-300 text-sm">
-            Veuillez sélectionner un laboratoire avant d'importer un fichier CSV.
+            Veuillez sélectionner un laboratoire avant d importer un fichier CSV.
           </p>
         </div>
       )}
@@ -304,7 +303,7 @@ export const CsvUploader: React.FC = () => {
               />
             </div>
             <p className="text-xs text-gray-500">
-              Format accepté : CSV avec "code;quantité" (les articles avec quantité 0 seront ignorés)
+              Format accepté : CSV avec  code;quantité (les articles avec quantité 0 seront ignorés)
             </p>
           </div>
         </div>

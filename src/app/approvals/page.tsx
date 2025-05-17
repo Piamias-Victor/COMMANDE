@@ -68,12 +68,6 @@ export default function ApprovalsPage() {
     });
   }, [orders, selectedLabId, showProcessed]);
 
-  // Get lab name from ID
-  const getLabName = (id: string) => {
-    const lab = labs.find(lab => lab.id === id);
-    return lab ? lab.name : 'Laboratoire inconnu';
-  };
-
   // Handle status change
   const handleStatusChange = async (order: Order, newStatus: 'approved' | 'rejected') => {
     setProcessingOrderId(order.id);
@@ -292,11 +286,10 @@ export default function ApprovalsPage() {
                           </Button>
                           <Button
                             variant="outline"
-                            className="text-red-600 border-red-200 hover:bg-red-50"
+                            className="text-red-600 border-red-200 hover:bg-red-50 flex-1"
                             onClick={() => handleStatusChange(order, 'rejected')}
                             disabled={processingOrderId === order.id}
                             loading={processingOrderId === order.id && order.status === 'pending'}
-                            className="flex-1"
                           >
                             Rejeter
                           </Button>

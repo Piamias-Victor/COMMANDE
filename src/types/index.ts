@@ -19,6 +19,22 @@ export interface Pharmacy {
 }
 
 /**
+ * Représente un laboratoire pharmaceutique
+ */
+export interface Lab {
+  /** Identifiant unique du laboratoire */
+  id: string;
+  /** Nom du laboratoire */
+  name: string;
+  /** URL de l'image du logo (optionnel) */
+  logoUrl?: string;
+  /** Date de création dans le système */
+  createdAt: Date;
+  /** Date de dernière modification */
+  updatedAt: Date;
+}
+
+/**
  * États possibles pour une commande
  */
 export type OrderStatus = 

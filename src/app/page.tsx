@@ -4,7 +4,6 @@ import { MainLayout } from '@/components/layouts/MainLayout';
 import { LabSelector } from '@/components/features/LabSelector';
 import { CsvUploader } from '@/components/features/CsvUploader';
 import { StatsSummary } from '@/components/features/StatsSummary';
-import { OrderStatusSummary } from '@/components/features/OrderStatusSummary';
 import { Card } from '@/components/ui/Card';
 import { useEffect } from 'react';
 import { usePharmacyStore } from '@/store/pharmacyStore';
