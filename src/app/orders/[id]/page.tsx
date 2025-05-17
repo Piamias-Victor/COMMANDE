@@ -1,62 +1,51 @@
+// src/app/orders/[id]/page.tsx (mise à jour finale)
 'use client';
 
-import React, { useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { MainLayout } from '@/components/layouts/MainLayout';
-import { useOrderStore } from '@/store/orderStore';
-import { useLabStore } from '@/store/labStore'; 
-import { usePharmacyStore } from '@/store/pharmacyStore';
+import { useOrderDetails } from '@/hooks/useOrderDetails';
+import { useOrderActions } from '@/hooks/useOrderActions';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
+import { OrderBasicInfo } from '@/components/features/OrderBasicInfo';
+import { ProductList } from '@/components/features/ProductList';
+import { OrderHistory } from '@/components/features/OrderHistory';
 import { OrderWorkflow } from '@/components/features/OrderWorkflow';
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { OrderExports } from '@/components/features/OrderExports';
+import { OrderComments } from '@/components/features/OrderComments';
+import { Spinner } from '@/components/ui/Spinner';
 
-export default function OrderDetailsPage() {
+export default function OrderDetailPage() {
   const params = useParams();
   const router = useRouter();
   const orderId = params.id as string;
+  const { order, isLoading, error, lab, pharmacy } = useOrderDetails(orderId);
+  const { handleRefresh } = useOrderActions(orderId);
   
-  const { orders } = useOrderStore();
-  const { labs } = useLabStore();
-  const { pharmacies } = usePharmacyStore();
-  
-  const order = useMemo(() => {
-    return orders.find(o => o.id === orderId);
-  }, [orders, orderId]);
-  
-  const lab = useMemo(() => {
-    if (!order) return null;
-    return labs.find(l => l.id === order.labId);
-  }, [labs, order]);
-  
-  const pharmacy = useMemo(() => {
-    if (!order) return null;
-    return pharmacies.find(p => p.id === order.pharmacyId);
-  }, [pharmacies, order]);
-  
-  if (!order) {
+  if (isLoading) {
     return (
       <MainLayout>
-        <div className="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg">
-          <div className="px-4 py-5 sm:p-6">
-            <div className="text-center">
-              <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-white">
-                Commande introuvable
-              </h3>
-              <div className="mt-2">
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  La commande que vous recherchez n'existe pas ou a été supprimée.
-                </p>
-              </div>
-              <div className="mt-5">
-                <Button onClick={() => router.push('/orders')}>
-                  Retour aux commandes
-                </Button>
-              </div>
-            </div>
-          </div>
+        <div className="flex items-center justify-center min-h-[500px]">
+          <Spinner size="lg" />
         </div>
+      </MainLayout>
+    );
+  }
+  
+  if (error || !order) {
+    return (
+      <MainLayout>
+        <Card className="p-6">
+          <div className="text-center">
+            <h2 className="text-xl font-bold text-red-600 mb-4">
+              {error || "Commande introuvable"}
+            </h2>
+            <Button onClick={() => router.push('/orders')}>
+              Retour à la liste des commandes
+            </Button>
+          </div>
+        </Card>
       </MainLayout>
     );
   }
@@ -64,87 +53,171 @@ export default function OrderDetailsPage() {
   return (
     <MainLayout>
       <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Détail de la commande</h1>
-          <Button variant="outline" onClick={() => router.push('/orders')}>
-            Retour à la liste
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold">Détail de la commande</h1>
+            <span className="text-gray-500">#{order.id.substring(0, 8)}</span>
+          </div>
+          <Button 
+            variant="outline"
+            onClick={() => router.push('/orders')}
+          >
+            <span className="flex items-center gap-1">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              Retour à la liste
+            </span>
           </Button>
         </div>
         
-        <Card className="bg-white dark:bg-gray-800 p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h2 className="text-lg font-medium mb-4">Informations générales</h2>
-              <dl className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
-                <div className="sm:col-span-1">
-                  <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Fichier</dt>
-                  <dd className="mt-1 text-sm text-gray-900 dark:text-white">{order.fileName}</dd>
-                </div>
-                <div className="sm:col-span-1">
-                  <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Date de création</dt>
-                  <dd className="mt-1 text-sm text-gray-900 dark:text-white">
-                    {format(new Date(order.createdAt), 'dd MMMM yyyy, HH:mm', { locale: fr })}
-                  </dd>
-                </div>
-                <div className="sm:col-span-1">
-                  <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Laboratoire</dt>
-                  <dd className="mt-1 text-sm text-gray-900 dark:text-white">{lab?.name || 'Inconnu'}</dd>
-                </div>
-                <div className="sm:col-span-1">
-                  <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Pharmacie</dt>
-                  <dd className="mt-1 text-sm text-gray-900 dark:text-white">{pharmacy?.name || 'Inconnue'}</dd>
-                </div>
-                <div className="sm:col-span-1">
-                  <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Références</dt>
-                  <dd className="mt-1 text-sm text-gray-900 dark:text-white">{order.referencesCount}</dd>
-                </div>
-                <div className="sm:col-span-1">
-                  <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Boîtes</dt>
-                  <dd className="mt-1 text-sm text-gray-900 dark:text-white">{order.boxesCount}</dd>
-                </div>
-              </dl>
-            </div>
-            
-            <div>
-              <h2 className="text-lg font-medium mb-4">Contenu de la commande</h2>
-              <div className="bg-gray-50 dark:bg-gray-900 p-3 rounded-md max-h-60 overflow-y-auto">
-                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                  <thead className="bg-gray-50 dark:bg-gray-800">
-                    <tr>
-                      <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Code EAN13
-                      </th>
-                      <th className="px-3 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Quantité
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800">
-                    {order.parsedData.slice(0, 20).map((item, index) => (
-                      <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-800">
-                        <td className="px-3 py-2 whitespace-nowrap text-xs text-gray-500 dark:text-gray-400">
-                          {item.code}
-                        </td>
-                        <td className="px-3 py-2 whitespace-nowrap text-xs text-right text-gray-500 dark:text-gray-400">
-                          {item.quantity}
-                        </td>
-                      </tr>
-                    ))}
-                    {order.parsedData.length > 20 && (
-                      <tr>
-                        <td colSpan={2} className="px-3 py-2 text-center text-xs text-gray-500 dark:text-gray-400">
-                          ... et {order.parsedData.length - 20} autres références
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </Card>
+        <OrderBasicInfo order={order} lab={lab} pharmacy={pharmacy} />
         
-        <OrderWorkflow order={order} onUpdate={() => router.refresh()} />
+        <Tabs defaultValue="details" className="w-full">
+          <TabsList>
+            <TabsTrigger value="details">Détails</TabsTrigger>
+            <TabsTrigger value="products">Produits ({order.referencesCount})</TabsTrigger>
+            <TabsTrigger value="status">Statut et livraison</TabsTrigger>
+            <TabsTrigger value="exports">Exports</TabsTrigger>
+            <TabsTrigger value="comments">Commentaires</TabsTrigger>
+            <TabsTrigger value="history">Historique</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="details" className="mt-4">
+            <Card className="p-6">
+              <h3 className="text-lg font-medium mb-4">Informations détaillées</h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <h4 className="text-sm font-medium mb-2 text-gray-500">Commande</h4>
+                  <dl className="space-y-2">
+                    <div className="grid grid-cols-2 gap-4">
+                      <dt className="text-sm font-medium text-gray-500">Nom du fichier</dt>
+                      <dd className="text-sm">{order.fileName}</dd>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <dt className="text-sm font-medium text-gray-500">Références uniques</dt>
+                      <dd className="text-sm">{order.referencesCount}</dd>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <dt className="text-sm font-medium text-gray-500">Nombre de boîtes</dt>
+                      <dd className="text-sm">{order.boxesCount}</dd>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <dt className="text-sm font-medium text-gray-500">Date de création</dt>
+                      <dd className="text-sm">{new Date(order.createdAt).toLocaleString('fr-FR')}</dd>
+                    </div>
+                    {order.reviewedAt && (
+                      <div className="grid grid-cols-2 gap-4">
+                        <dt className="text-sm font-medium text-gray-500">Date de revue</dt>
+                        <dd className="text-sm">{new Date(order.reviewedAt).toLocaleString('fr-FR')}</dd>
+                      </div>
+                    )}
+                    {order.reviewedBy && (
+                      <div className="grid grid-cols-2 gap-4">
+                        <dt className="text-sm font-medium text-gray-500">Revu par</dt>
+                        <dd className="text-sm">{order.reviewedBy}</dd>
+                      </div>
+                    )}
+                  </dl>
+                </div>
+                
+                <div>
+                  <h4 className="text-sm font-medium mb-2 text-gray-500">Informations associées</h4>
+                  <dl className="space-y-2">
+                    <div className="grid grid-cols-2 gap-4">
+                      <dt className="text-sm font-medium text-gray-500">Laboratoire</dt>
+                      <dd className="text-sm">{lab?.name || 'Inconnu'}</dd>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <dt className="text-sm font-medium text-gray-500">Pharmacie</dt>
+                      <dd className="text-sm">{pharmacy?.name || 'Inconnue'}</dd>
+                    </div>
+                    {pharmacy?.email && (
+                      <div className="grid grid-cols-2 gap-4">
+                        <dt className="text-sm font-medium text-gray-500">Email pharmacie</dt>
+                        <dd className="text-sm">{pharmacy.email}</dd>
+                      </div>
+                    )}
+                    {pharmacy?.address && (
+                      <div className="grid grid-cols-2 gap-4">
+                        <dt className="text-sm font-medium text-gray-500">Adresse pharmacie</dt>
+                        <dd className="text-sm">{pharmacy.address}</dd>
+                      </div>
+                    )}
+                    {order.expectedDeliveryDate && (
+                      <div className="grid grid-cols-2 gap-4">
+                        <dt className="text-sm font-medium text-gray-500">Livraison prévue</dt>
+                        <dd className="text-sm">{new Date(order.expectedDeliveryDate).toLocaleDateString('fr-FR')}</dd>
+                      </div>
+                    )}
+                    {order.deliveredAt && (
+                      <div className="grid grid-cols-2 gap-4">
+                        <dt className="text-sm font-medium text-gray-500">Livré le</dt>
+                        <dd className="text-sm">{new Date(order.deliveredAt).toLocaleString('fr-FR')}</dd>
+                      </div>
+                    )}
+                  </dl>
+                </div>
+              </div>
+              
+              {order.reviewNote && (
+                <div className="mt-6">
+                  <h4 className="text-sm font-medium mb-2 text-gray-500">Note</h4>
+                  <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded border border-gray-200 dark:border-gray-700">
+                    <p className="text-sm">{order.reviewNote}</p>
+                  </div>
+                </div>
+              )}
+              
+              <div className="mt-6 flex justify-end">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    const blob = new Blob([order.rawContent], { type: 'text/csv' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = order.fileName;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                  }}
+                >
+                  Télécharger le fichier CSV
+                </Button>
+              </div>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="products" className="mt-4">
+            <ProductList order={order} />
+          </TabsContent>
+          
+          <TabsContent value="status" className="mt-4">
+            <OrderWorkflow 
+              order={order} 
+              onUpdate={handleRefresh}
+            />
+          </TabsContent>
+          
+          <TabsContent value="exports" className="mt-4">
+            <OrderExports 
+              order={order}
+              lab={lab}
+              pharmacy={pharmacy}
+            />
+          </TabsContent>
+          
+          <TabsContent value="comments" className="mt-4">
+            <OrderComments orderId={order.id} />
+          </TabsContent>
+          
+          <TabsContent value="history" className="mt-4">
+            <OrderHistory order={order} />
+          </TabsContent>
+        </Tabs>
       </div>
     </MainLayout>
   );

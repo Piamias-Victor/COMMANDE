@@ -1,3 +1,4 @@
+// src/components/features/OrdersTable.tsx
 import React, { useState, useMemo } from 'react';
 import { useLabStore } from '@/store/labStore';
 import { usePharmacyStore } from '@/store/pharmacyStore';
@@ -7,6 +8,7 @@ import { Card } from '@/components/ui/Card';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import toast from 'react-hot-toast';
+import Link from 'next/link';
 
 type SortField = 'date' | 'fileName' | 'referencesCount' | 'boxesCount';
 type SortDirection = 'asc' | 'desc';
@@ -111,38 +113,38 @@ export const OrdersTable: React.FC = () => {
     }, {} as Record<string, string>);
   }, [labs]);
 
-// Dans la partie du mappage des pharmacies
-const pharmaciesMap = useMemo(() => {
-  const map: Record<string, string> = {};
-  
-  // Créer un mappage par ID
-  pharmacies.forEach(pharmacy => {
-    map[pharmacy.id] = pharmacy.name;
-  });
-  
-  // Fonction qui retourne le nom d'une pharmacie par ID
-  return (id: string) => {
-    // Essayer de trouver par ID direct
-    if (map[id]) return map[id];
+  // Dans la partie du mappage des pharmacies
+  const pharmaciesMap = useMemo(() => {
+    const map: Record<string, string> = {};
     
-    // Si l'ID commence par "pharmacy-" (format NextAuth)
-    if (id.startsWith('pharmacy-')) {
-      const index = parseInt(id.split('-')[1]);
-      if (index >= 1 && index <= 5) {
-        const names = [
-          'Pharmacie Centrale',
-          'Pharmacie du Port',
-          'Pharmacie des Alpes',
-          'Pharmacie de la Gare',
-          'Pharmacie de l\'Étoile'
-        ];
-        return names[index - 1];
+    // Créer un mappage par ID
+    pharmacies.forEach(pharmacy => {
+      map[pharmacy.id] = pharmacy.name;
+    });
+    
+    // Fonction qui retourne le nom d'une pharmacie par ID
+    return (id: string) => {
+      // Essayer de trouver par ID direct
+      if (map[id]) return map[id];
+      
+      // Si l'ID commence par "pharmacy-" (format NextAuth)
+      if (id.startsWith('pharmacy-')) {
+        const index = parseInt(id.split('-')[1]);
+        if (index >= 1 && index <= 5) {
+          const names = [
+            'Pharmacie Centrale',
+            'Pharmacie du Port',
+            'Pharmacie des Alpes',
+            'Pharmacie de la Gare',
+            'Pharmacie de l\'Étoile'
+          ];
+          return names[index - 1];
+        }
       }
-    }
-    
-    return 'Pharmacie inconnue';
-  };
-}, [pharmacies]);
+      
+      return 'Pharmacie inconnue';
+    };
+  }, [pharmacies]);
 
   const renderSortIcon = (field: SortField) => {
     if (sortField !== field) return null;
@@ -330,6 +332,14 @@ const pharmaciesMap = useMemo(() => {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <div className="flex justify-end gap-2">
+                    <Link href={`/orders/${order.id}`}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                      >
+                        Détails
+                      </Button>
+                    </Link>
                     <Button
                       variant="outline"
                       size="sm"
