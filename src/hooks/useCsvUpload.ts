@@ -167,6 +167,7 @@ export function useCsvUpload(pharmacyId: string | null) {
     handleFileSelect,
     handleButtonClick,
     handleCancelUpload,
-    handleSubmit
+    handleSubmit,
+    parseResult
   };
 }

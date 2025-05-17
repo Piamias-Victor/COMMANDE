@@ -1,5 +1,3 @@
-'use client';
-
 import React from 'react';
 import { usePharmacyId } from '@/hooks/usePharmacyId';
 import { Card } from '@/components/ui/Card';
@@ -62,7 +60,7 @@ export const CsvUploader: React.FC = () => {
           onDragLeave={handleDrag}
           onDrop={handleDrop}
           onButtonClick={handleButtonClick}
-          fileInputRef={fileInputRef}
+          fileInputRef={fileInputRef as React.RefObject<HTMLInputElement>}
           onFileChange={handleFileSelect}
         />
       )}

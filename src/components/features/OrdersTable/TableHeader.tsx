@@ -1,11 +1,20 @@
 import React from 'react';
 
+// Importez les types nécessaires
+type SortField = 'date' | 'fileName' | 'referencesCount' | 'boxesCount';
+type SortDirection = 'asc' | 'desc';
+
 interface TableHeaderProps {
-  sortField: string;
-  handleSort: (field: any) => void;
+  sortField: SortField;
+  sortDirection: SortDirection; // Ajoutez cette ligne pour inclure la propriété manquante
+  handleSort: (field: SortField) => void;
 }
 
-export const TableHeader: React.FC<TableHeaderProps> = ({ sortField, handleSort }) => {
+export const TableHeader: React.FC<TableHeaderProps> = ({ 
+  sortField, 
+  sortDirection, 
+  handleSort 
+}) => {
   const renderSortIcon = (field: string) => {
     if (sortField !== field) return null;
     
