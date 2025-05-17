@@ -27,7 +27,6 @@ export default function Home() {
           
           <StatsSummary />
           
-          <OrderStatusSummary />
         </section>
         
         <section className="mt-6">
