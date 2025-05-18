@@ -1,9 +1,10 @@
+// src/hooks/useLogin.ts
 import { useState, useCallback } from 'react';
 import { signIn } from "next-auth/react";
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 
-export function useLogin() {
+export function useLogin(callbackUrl: string = '/') {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
@@ -24,13 +25,14 @@ export function useLogin() {
         redirect: false,
         email,
         password,
+        callbackUrl,
       });
       
       if (result?.error) {
         toast.error('Email ou mot de passe incorrect');
       } else {
         toast.success('Connexion réussie');
-        router.push('/');
+        router.push(callbackUrl);
         router.refresh();
       }
     } catch (error) {
@@ -39,7 +41,7 @@ export function useLogin() {
     } finally {
       setIsLoggingIn(false);
     }
-  }, [email, password, router]);
+  }, [email, password, router, callbackUrl]);
 
   return {
     email,

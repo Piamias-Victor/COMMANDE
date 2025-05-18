@@ -1,10 +1,15 @@
+// src/components/features/Login/index.tsx
 import React from 'react';
 import { Card } from '@/components/ui/Card';
 import { useLogin } from '@/hooks/useLogin';
 import { LoginForm } from './LoginForm';
 import { DemoAccounts } from './DemoAccounts';
 
-export const Login: React.FC = () => {
+interface LoginProps {
+  callbackUrl?: string;
+}
+
+export const Login: React.FC<LoginProps> = ({ callbackUrl = '/' }) => {
   const {
     email,
     setEmail,
@@ -12,7 +17,7 @@ export const Login: React.FC = () => {
     setPassword,
     isLoggingIn,
     handleSubmit
-  } = useLogin();
+  } = useLogin(callbackUrl);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4">
